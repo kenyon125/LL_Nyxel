@@ -1,0 +1,141 @@
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//	dev for V0.1(0)   24.08.30
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Hardware:
+	"Nyx_main V0.1", which is nRF52832.
+	Application ble name: NyxEVT
+
+Firmware DTM:
+	(TO DO)
+
+Firmware Bootloader:
+		BLE name is "NyxEVT".
+
+Firmware Application:
+
+	Port the Dragonfly code to complete the Nyx firmware based on Ebike
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//	dev for V0.1(0)   24.10.16
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Hardware:
+	"240927 NYX_MianBoard_V0.4", which is nRF52832.
+	Application ble name: NyxelEVT
+
+Firmware DTM:
+	(TO DO)
+
+Firmware Bootloader:
+		BLE name is "NyxelEVT".
+		Due to the shortage of light bar supply, the bootloader still uses buzzer to prompt, and will change to pcb_blue to indicate later
+
+Firmware Application:
+	BLE name is "NyxelEVT".
+	Base On  NyxEVT
+	The animation needs to be perfected.
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//	No quin :dev for V0.2(0)   25.01.03
+//	Quin :dev for V0.3(0)   25.01.03
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Hardware:
+	"240927 NYX_MianBoard_V0.4", which is nRF52832.
+	Application ble name: NyxelDVT
+
+Firmware DTM:
+	(TO DO)
+
+Firmware Bootloader:
+		BLE name is "NyxelDVT".
+		Due to the shortage of light bar supply, the bootloader still uses buzzer to prompt, and will change to pcb_blue to indicate later
+
+Firmware Application:
+	BLE name is "NyxelDVT".
+	Base On  NyxEVT
+
+1. add some ble command
+2. bootloader: buzzer work instead of blue pcb light
+3. improve battery work curve
+4. add ble disconnect if not send 6bytes
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//	No quin : dev for V0.2(2)   25.03.14  
+//	Quin : dev for V0.3(2)        25.03.14  
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Hardware:
+	"250222 NYX_MianBoard_V0.43M", which is nRF52832.
+	Application ble name: NyxelDVT
+
+Firmware DTM:
+	(TO DO)
+
+Firmware Bootloader:
+		BLE name is "NyxelDVT".
+
+Firmware Application:
+	BLE name is "NyxelDVT".
+	Base On  NyxEVT
+
+1. Detect Board Pin : pull down -> no pull
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//	No quin : dev for V1.0(0)   25.04.09 
+//	Quin : Nyxel_withQuin for V1.0(0)        25.04.09 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Hardware:
+	"250408 NYX_MianBoard_V0.45", which is nRF52832.
+
+Firmware DTM:
+	(TO DO)
+
+Firmware Bootloader:
+	NoQuin:	BLE name is "Nyxel".
+	Quin: BLE name is "Nyxel-Q"
+Firmware Application:
+	NoQuin:	BLE name is "Nyxel".
+	Quin: BLE name is "Nyxel-Q"
+	All Base On  NyxDVT
+
+No Quin:
+Official version v1.0(0)
+
+1. Heap size&Stack size: 8k->6k
+2. Improve all animations
+3. Improve sync msg 
+4. add factory mode
+5. fix the bug 'white flash when power on’
+6. ble name: NyxelDVT -> Nyxel
+7. add app command:color disk
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//	No quin : dev for V1.2(0)   25.07.09 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Hardware:
+	"250408 NYX_MianBoard_V0.45", which is nRF52832.
+
+Firmware DTM:
+	(TO DO)
+
+Firmware Bootloader:
+	NoQuin:	BLE name is "Nyxel".
+Firmware Application:
+	NoQuin:	BLE name is "Nyxel".
+
+No Quin:
+Official version v1.2(0)  25.07.15
+
+1. PCB TEST Improve
+2. add buzzer command +Add buzzer command + fix buzzer when short press
+3.  fix remote lite  report logic
+4. fix ANC bug + add f? command + modify pink color
+5. 改善半成品测试代码
+6. 配对模式下被sync后会退出呼吸模式
+7.兼容新ws2812灯条和老2s2812灯条的新rgb值
+
+

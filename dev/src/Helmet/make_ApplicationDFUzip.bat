@@ -1,0 +1,1 @@
+nrfutil pkg generate --hw-version 52 --sd-req 0x101 --application-version 2 --application ../../HEX/Helmet/Nyx_application.hex --key-file private.pem  ../../HEX/Helmet/Nyx_Application.zip

@@ -1,0 +1,389 @@
+
+#ifndef LL_LED_PANEL_WS2812_H__
+#define LL_LED_PANEL_WS2812_H__
+
+#include "nordic_common.h"
+#include "nrf.h"
+#include "nrf_drv_gpiote.h"
+#include <string.h>
+#include "LL_GPIO.h"
+
+#define WS2812_T1H                  14 | 0x8000   // In each value, the most significant bit (15)determines the polarity of the output and theothers (14-0) compose the 15-bit value
+#define WS2812_T0H                  6  | 0x8000
+
+#define LL_ANIMATION_FRAME_NUM     48
+#define LL_ANIMATION_MATRIX_FRAME  28
+#define LL_LED_MATRIX_WIDTH        28
+#define LL_LED_MATRIX_HEIGHT       1
+
+#define LED_MATRIX_TOTAL_BYTE_WIDTH	 LL_LED_MATRIX_WIDTH * LL_LED_MATRIX_HEIGHT * 3
+#define LED_MATRIX_TOTAL_BIT_WIDTH	 LED_MATRIX_TOTAL_BYTE_WIDTH * 8
+
+#define LL_ANIMATION_POWERON_STEP  6
+
+extern bool glOneAnimationPlayOff;
+extern uint8_t glAnimationPlayCnt;
+
+typedef struct
+{
+    uint8_t g;
+    uint8_t r;
+    uint8_t b;
+}rgb_color_t;
+
+typedef enum
+{
+   DEFAULT_BLACK = 0,
+   DEFAULT_RED ,
+   DEFAULT_WHITE, 
+   DEFAULT_YELLOW,
+   DEFAULT_ORANGE,
+   DEFAULT_GREEN,
+   DEFAULT_BLUE,
+   DEFAULT_PURPLE,
+   MAX_WHITE,  
+   MAX_RED,
+   TURNSIGNAL_ORANGE,
+   CHARGING_RED,
+   CHARGING_ORANGE,
+   CHARGING_GREEN,
+   COLOR_CODE_NUM,
+}animation_color_code;
+
+typedef enum
+{
+   COLOR_DISK_WHITE = 0,
+   COLOR_DISK_RED ,
+   COLOR_DISK_PURPLE ,
+   COLOR_DISK_BLUE_GREEN,
+   COLOR_DISK_PINK,
+   COLOR_DISK_YELLOW_GREEN,
+   COLOR_DISK_BLUE,
+   COLOR_DISK_ORANGE,
+   COLOR_DISK_NUM,
+}animation_color_disk_withApp;
+
+typedef enum
+{
+   APP_BRIGTNESS_LEVEL_0 = 0,
+   APP_BRIGTNESS_LEVEL_1 ,
+   APP_BRIGTNESS_LEVEL_2 ,
+   APP_BRIGTNESS_LEVEL_3,
+   APP_BRIGTNESS_LEVEL_4,
+   APP_BRIGTNESS_LEVEL_5,
+   APP_BRIGTNESS_LEVEL_NUM, 
+}animation_color_brightness_withApp;
+
+typedef enum
+{
+   POWERON_BLACK = 0,
+   POWERON_BLUE_1,
+   POWERON_BLUE_2, 
+   POWERON_BLUE_3,
+   POWERON_BLUE_4,
+   POWERON_BLUE_5,
+   POWERON_BLUE_6,
+   POWERON_BLUE_7,
+   POWERON_BLUE_8,  
+   POWERON_BLUE_9,
+   POWERON_BLUE_10,
+   POWERON_BLUE_11,
+   POWERON_BLUE_12,
+   POWERON_BLUE_13,
+   POWERON_BLUE_14,
+   POWERON_BLUE_15,
+   POWERON_BLUE_16,
+   POWERON_BLUE_NUM,
+}animation_poweron_color_code;
+
+typedef enum
+{
+    LED_ANIMATION_SOLID_MODE = 0, 
+    LED_ANIMATION_SLOWFLASH_MODE, 
+    LED_ANIMATION_FASTFLASH_MODE,
+    LED_ANIMATION_HALFBLINK_MODE,
+    LED_ANIMATION_DOUBLEWAVE_MODE,    
+    LED_ANIMATION_RICOCHET_MODE,
+    LED_ANIMATION_ALARM_MODE,
+    LED_ANIMATION_COMMON_MODE_NUM,
+    LED_ANIMATION_BREATHING_MODE,
+    LED_ANIMATION_BATDISPLAY_MODE,
+    LED_ANIMATION_POWERON_LEVEL_1,
+    LED_ANIMATION_POWERON_LEVEL_2,
+    LED_ANIMATION_POWERON_LEVEL_3,
+    LED_ANIMATION_POWERON_LEVEL_4,
+    LED_ANIMATION_POWEROFF,
+    LED_ANIMATION_TURNLEFT_SIGNAL, 
+    LED_ANIMATION_TURNRIGHT_SIGNAL, 
+    LED_ANIMATION_TURNLEFT_FLASH_SIGNAL, 
+    LED_ANIMATION_TURNRIGHT_FLASH_SIGNAL, 
+    LED_ANIMATION_BRAKE_SIGNAL_SOLID,
+    LED_ANIMATION_BRAKE_SIGNAL_SHARPFLASH,
+    LED_ANIMATION_PAIRING_MODE,
+    LED_ANIMATION_CHARGING,
+    LED_ANIMATION_CHARING_LEVEL_0,
+    LED_ANIMATION_CHARING_LEVEL_1,
+    LED_ANIMATION_CHARING_LEVEL_2,
+    LED_ANIMATION_CHARING_LEVEL_3,
+    LED_ANIMATION_CHARING_LEVEL_4,
+    LED_ANIMATION_CHARING_LEVEL_5,
+		LED_ANIMATION_PRODUCT_TESTING,
+} E_Ws2812_Animation_Type;
+
+typedef struct {
+    //unsigned long stay_ms; // stay time of this frame, 0 means static
+    unsigned char color_code[LL_LED_MATRIX_WIDTH]; // "1": 1 byte of color index
+} T_FRAME__COLOR_CODE_FORMAT;
+
+typedef struct {
+    unsigned long stay_ms; // stay time of this frame, 0 means static
+    unsigned long data[LL_LED_MATRIX_WIDTH]; // "1": 1 byte of color index
+} T_FRAME__RGB_FORMAT;
+
+#define WS2812_COLOR_NONEED                  0x00000000
+#define WS2812_COLOR_RED	   				 0x00C80000   //70%
+#define WS2812_COLOR_GREEN   				 0x0000FF00
+#define WS2812_COLOR_BLUE    				 0x000000FF
+#define WS2812_COLOR_YELLOW  				 0x00FF8000
+#define WS2812_COLOR_LIGHTSTEELWHITE         0x00778899
+#define WS2812_COLOR_BLACK      		     0x00000000
+#define WS2812_COLOR_PURPLE			 		 0x00800080	  
+#define WS2812_COLOR_ANTIQUEWHITE		     0x00FAEBD7	  //	古代的白色
+#define WS2812_COLOR_ORANGE				     0x00641500	  //	橙色
+#define WS2812_COLOR_SKYBLUE                 0x002F41FF
+#define WS2812_COLOR_ALARMBLUE               0x00366092
+#define WS2812_COLOR_TURNSIGNAL              0x00FF3700
+#define WS2812_COLOR_CHARGING_WHITE          0x00112233
+
+//charging
+#define WS2812_COLOR_CHARGING_ORANGE                 0x00140400	  //orange:10%
+#define WS2812_COLOR_CHARGING_RED				     0x00190000   //red:10%
+#define WS2812_COLOR_CHARGING_GREEN				     0x00001900	  //green:10%
+
+
+#define WS2812_COLOR_WHITE         0x00CC6860 	//	WHITE 80%  
+
+#define WS2812_COLOR_WHITE_5		 	 0x000C0605	  //	WHITE 5%
+#define WS2812_COLOR_WHITE_40      0x00663328   //  WHITE 40%
+#define WS2812_COLOR_WHITE_50		 	 0x00804032	  //	WHITE 50%
+#define WS2812_COLOR_WHITE_60      0x00994D3C   //  WHITE 60%
+#define WS2812_COLOR_WHITE_70		 	 0x00B35A46	  //	WHITE 70%
+#define WS2812_COLOR_WHITE_100		 0x00FF8064 	// new ws2812:0xFF8064  old ws2812:0x00FFAA64	 
+
+#define WS2812_COLOR_RED_5		 0x000B0000	  //	RED5%
+#define WS2812_COLOR_RED_10		 0x00160000	  //	RED10%
+#define WS2812_COLOR_RED_20		 0x00320000	  //	RED20%
+#define WS2812_COLOR_RED_30		 0x004B0000	  //	RED30%
+#define WS2812_COLOR_RED_40		 0x00640000	  //	RED40%
+#define WS2812_COLOR_RED_50		 0x007D0000	  //	RED50%
+#define WS2812_COLOR_RED_60		 0x00960000	  //	RED60%
+#define WS2812_COLOR_RED_70		 0x00AF0000	  //	RED70%
+#define WS2812_COLOR_RED_80		 0x00C80000	 	//	RED80%
+#define WS2812_COLOR_RED_100   0x00FF0000		//	RED100%
+
+#define WS2812_COLOR_PURPLE_100   0x00FF00FF  // purple 100%
+#define WS2812_COLOR_PURPLE_80    0x00CC00CC	// purple 80%
+#define WS2812_COLOR_PURPLE_70    0x00B300B3	// purple 70%
+#define WS2812_COLOR_PURPLE_60    0x00990099	// purple 60%
+#define WS2812_COLOR_PURPLE_50    0x00800080	// purple 50%
+#define WS2812_COLOR_PURPLE_40    0x00660066	// purple 40%
+
+#define WS2812_COLOR_BLUE_GREEN_100   0x0000FF50  // blue-green 100%
+#define WS2812_COLOR_BLUE_GREEN_80    0x0000CC40  // blue-green 80%
+#define WS2812_COLOR_BLUE_GREEN_70    0x0000B238  // blue-green 70%
+#define WS2812_COLOR_BLUE_GREEN_60    0x00009930  // blue-green 60%
+#define WS2812_COLOR_BLUE_GREEN_50    0x00008028  // blue-green 50%
+#define WS2812_COLOR_BLUE_GREEN_40    0x00006620  // blue-green 40%
+
+#define WS2812_COLOR_PINK_100   0x00FF3C1E  // Pink 100%
+#define WS2812_COLOR_PINK_80    0x00CC3018  // Pink 80%
+#define WS2812_COLOR_PINK_70    0x00B22A15  // Pink 70%
+#define WS2812_COLOR_PINK_60    0x00992412  // Pink 60%
+#define WS2812_COLOR_PINK_50    0x00801E0F  // Pink 50%
+#define WS2812_COLOR_PINK_40    0x0066180C  // Pink 40%
+
+#define WS2812_COLOR_YELLOW_GREEN_100   0x00FFFF00  // yellow-green 100%
+#define WS2812_COLOR_YELLOW_GREEN_80    0x00CCCC00  // yellow-green 80%
+#define WS2812_COLOR_YELLOW_GREEN_70    0x00B2B200  // yellow-green 70%
+#define WS2812_COLOR_YELLOW_GREEN_60    0x00999900  // yellow-green 60%
+#define WS2812_COLOR_YELLOW_GREEN_50    0x00808000  // yellow-green 50%
+#define WS2812_COLOR_YELLOW_GREEN_40    0x00666600  // yellow-green 40%
+
+#define WS2812_COLOR_BLUE_100   0x001414FF  // blue 100%
+#define WS2812_COLOR_BLUE_80    0x001010CC  // blue 80%
+#define WS2812_COLOR_BLUE_70    0x000E0EB2  // blue 70%
+#define WS2812_COLOR_BLUE_60    0x000C0C99  // blue 60%
+#define WS2812_COLOR_BLUE_50    0x000A0A80  // blue 50%
+#define WS2812_COLOR_BLUE_40    0x00080866  // blue 40%
+#define WS2812_COLOR_BLUE_10    0x00000019  // blue 10%
+
+#define WS2812_COLOR_ORANGE_100   0x00FF6000  // orange 100%
+#define WS2812_COLOR_ORANGE_80    0x00CC4D00  // orange 80%
+#define WS2812_COLOR_ORANGE_70    0x00B24300  // orange 70%
+#define WS2812_COLOR_ORANGE_60    0x00993A00  // orange 60%
+#define WS2812_COLOR_ORANGE_50    0x00803000  // orange 50%
+#define WS2812_COLOR_ORANGE_40    0x00662600  // orange 40%
+
+
+#define WS2812_COLOR_GREEN_40     0x00006400   //   绿色40%
+//POWER ON
+#define WS2812_COLOR_AUQAMARIN   0x007FFFAA	  //	绿玉\碧绿色
+
+// Function for initializing the LCD controller.
+
+ret_code_t LL_Drv_Ws2812_Reset(void);
+
+void LL_Drv_Ws2812_SetFrontAnimation(E_Ws2812_Animation_Type AnimationType);
+void LL_Drv_Ws2812_SetRearAnimation(E_Ws2812_Animation_Type AnimationType);
+bool LL_Find_Color_Position(unsigned long ColorDisk, unsigned char *ColorType, unsigned char *BrightnessLevel);
+bool LL_Get_Color_Value_Via_Brightness(unsigned char Brightness, unsigned long *front_color, unsigned long *rear_color);
+bool LL_Get_Color_Value_Via_Color(unsigned char colorType, unsigned long *color) ;
+bool LL_Get_Color_Value_Via_Individual_Brightness(unsigned char Brightness, unsigned long *light_color) ;
+
+
+//typedef enum
+//{
+//    WS2812_COLOR_RED	   				= 0x00FF0000,
+//    WS2812_COLOR_GREEN   				= 0x0000FF00,
+//    WS2812_COLOR_BLUE    				= 0x000000FF,
+//		WS2812_COLOR_YELLOW  				= 0x00FF8000,
+
+//		WS2812_COLOR_LIGHTPINK 			= 0x00FFB6C1,	//	浅粉红
+//		WS2812_COLOR_PINK						= 0x00FFC0CB,	//	粉红
+//		WS2812_COLOR_CRIMSON				=	0x00DC143C,	//	猩红
+//		WS2812_COLOR_LAVENDERBLUSH	= 0x00FFF0F5,	//	脸红的淡紫色
+//		WS2812_COLOR_PALEVIOLETRED  = 0x00DB7093,	//	苍白的紫罗兰红色
+//		WS2812_COLOR_HOTPINK				= 0x00FF69B4,	//	热情的粉红
+//		WS2812_COLOR_DEEPPINK				= 0x00FF1493,	//	深粉色
+//		WS2812_COLOR_MEDIUMVIOLETRED = 0x00C71585,	//	适中的紫罗兰红色
+//		WS2812_COLOR_ORCHID					= 0x00DA70D6,	//	兰花的紫色
+//		WS2812_COLOR_THISTLE				= 0x00D8BFD8,	//	蓟
+//		WS2812_COLOR_PLUM						= 0x00DDA0DD,	//	李子
+//		WS2812_COLOR_VIOLET					= 0x00EE82EE,	//	紫罗兰
+//		WS2812_COLOR_MAGENTA						= 0x00FF00FF,	//	洋红
+//		WS2812_COLOR_FUCHSIA						= 0x00FF00FF	,  //	灯笼海棠(紫红色)
+//		WS2812_COLOR_DARKMAGENTA					= 0x008B008B	,  //	深洋红色
+//		WS2812_COLOR_PURPLE						= 0x00800080	,  //	紫色
+//		WS2812_COLOR_MEDIUMORCHID					= 0x00BA55D3	,  //	适中的兰花紫
+//		WS2812_COLOR_DARKVOILET					= 0x009400D3	,  //	深紫罗兰色
+//		WS2812_COLOR_DARKORCHID					= 0x009932CC	,  //	深兰花紫
+//		WS2812_COLOR_INDIGO						= 0x004B0082	,  //	靛青
+//		WS2812_COLOR_BLUEVIOLET					= 0x008A2BE2	,  //	深紫罗兰的蓝色
+//		WS2812_COLOR_MEDIUMPURPLE					= 0x009370DB	,  //	适中的紫色
+//		WS2812_COLOR_MEDIUMSLATEBLUE				= 0x007B68EE	,  //	适中的板岩暗蓝灰色
+//		WS2812_COLOR_SLATEBLUE						= 0x006A5ACD	,  //	板岩暗蓝灰色
+//		WS2812_COLOR_DARKSLATEBLUE					= 0x00483D8B	,  //	深岩暗蓝灰色
+//		WS2812_COLOR_LAVENDER						= 0x00E6E6FA	,  //	熏衣草花的淡紫色
+//		WS2812_COLOR_GHOSTWHITE					= 0x00F8F8FF	,  //	幽灵的白色
+//		//WS2812_COLOR_BLUE							= 0x000000FF	,  //	纯蓝
+//		WS2812_COLOR_MEDIUMBLUE					= 0x000000CD	,  //	适中的蓝色
+//		WS2812_COLOR_MIDNIGHTBLUE					= 0x00191970	,  //	午夜的蓝色
+//		WS2812_COLOR_DARKBLUE						= 0x0000008B	,  //	深蓝色
+//		WS2812_COLOR_NAVY							= 0x00000080	,  //	海军蓝
+//		WS2812_COLOR_ROYALBLUE						= 0x004169E1	,  //	皇家蓝
+//		WS2812_COLOR_CORNFLOWERBLUE				= 0x006495ED	,  //	矢车菊的蓝色
+//		WS2812_COLOR_LIGHTSTEELBLUE				= 0x00B0C4DE	,  //	淡钢蓝
+//		WS2812_COLOR_LIGHTSLATEGRAY				= 0x00778899	,  //	浅石板灰
+//		WS2812_COLOR_SLATEGRAY						= 0x00708090	,  //	石板灰
+//		WS2812_COLOR_DODERBLUE						= 0x001E90FF	,  //	道奇蓝
+//		WS2812_COLOR_ALICEBLUE						= 0x00F0F8FF	,  //	爱丽丝蓝
+//		WS2812_COLOR_STEELBLUE						= 0x004682B4	,  //	钢蓝
+//		WS2812_COLOR_LIGHTSKYBLUE					= 0x0087CEFA	,  //	淡蓝色
+//		WS2812_COLOR_SKYBLUE						= 0x0087CEEB	,  //	天蓝色
+//		WS2812_COLOR_DEEPSKYBLUE					= 0x0000BFFF	,  //	深天蓝
+//		WS2812_COLOR_LIGHTBLUE						= 0x00ADD8E6	,  //	淡蓝
+//		WS2812_COLOR_POWDERBLUE					= 0x00B0E0E6	,  //	火药蓝
+//		WS2812_COLOR_CADETBLUE						= 0x005F9EA0	,  //	军校蓝
+//		WS2812_COLOR_AZURE							= 0x00F0FFFF	,  //	蔚蓝色
+//		WS2812_COLOR_LIGHTCYAN						= 0x00E1FFFF	,  //	淡青色
+//		WS2812_COLOR_PALETURQUOISE					= 0x00AFEEEE	,  //	苍白的绿宝石
+//		WS2812_COLOR_CYAN							= 0x0000FFFF	,  //	青色
+//		WS2812_COLOR_AQUA							= 0x0000FFFF	,  //	水绿色
+//		WS2812_COLOR_DARKTURQUOISE					= 0x0000CED1	,  //	深绿宝石
+//		WS2812_COLOR_DARKSLATEGRAY					= 0x002F4F4F	,  //	深石板灰
+//		WS2812_COLOR_DARKCYAN						= 0x00008B8B	,  //	深青色
+//		WS2812_COLOR_TEAL							= 0x00008080	,  //	水鸭色
+//		WS2812_COLOR_MEDIUMTURQUOISE				= 0x0048D1CC	,  //	适中的绿宝石
+//		WS2812_COLOR_LIGHTSEAGREEN					= 0x0020B2AA	,  //	浅海洋绿
+//		WS2812_COLOR_TURQUOISE						= 0x0040E0D0	,  //	绿宝石
+//		WS2812_COLOR_AUQAMARIN						= 0x007FFFAA	,  //	绿玉\碧绿色
+//		WS2812_COLOR_MEDIUMAQUAMARINE				= 0x0000FA9A	,  //	适中的碧绿色
+//		WS2812_COLOR_MEDIUMSPRINGGREEN				= 0x0000FF7F	,  //	适中的春天的绿色
+//		WS2812_COLOR_MINTCREAM						= 0x00F5FFFA	,  //	薄荷奶油
+//		WS2812_COLOR_SPRINGGREEN					= 0x003CB371	,  //	春天的绿色
+//		WS2812_COLOR_SEAGREEN						= 0x002E8B57	,  //	海洋绿
+//		WS2812_COLOR_HONEYDEW						= 0x00F0FFF0	,  //	蜂蜜
+//		WS2812_COLOR_LIGHTGREEN					= 0x0090EE90	,  //	淡绿色
+//		WS2812_COLOR_PALEGREEN						= 0x0098FB98	,  //	苍白的绿色
+//		WS2812_COLOR_DARKSEAGREEN					= 0x008FBC8F	,  //	深海洋绿
+//		WS2812_COLOR_LIMEGREEN						= 0x0032CD32	,  //	酸橙绿
+//		WS2812_COLOR_LIME							= 0x0000FF00	,  //	酸橙色
+//		WS2812_COLOR_FORESTGREEN					= 0x00228B22	,  //	森林绿
+//		//WS2812_COLOR_GREEN							= 0x00008000	,  //	纯绿
+//		WS2812_COLOR_DARKGREEN						= 0x00006400	,  //	深绿色
+//		WS2812_COLOR_CHARTREUSE					= 0x007FFF00	,  //	查特酒绿
+//		WS2812_COLOR_LAWNGREEN						= 0x007CFC00	,  //	草坪绿
+//		WS2812_COLOR_GREENYELLOW					= 0x00ADFF2F	,  //	绿黄色
+//		WS2812_COLOR_OLIVEDRAB						= 0x00556B2F	,  //	橄榄土褐色
+//		WS2812_COLOR_BEIGE							= 0x00F5F5DC	,  //	米色(浅褐色)
+//		WS2812_COLOR_LIGHTGOLDENRODYELLOW			= 0x00FAFAD2	,  //	浅秋麒麟黄
+//		WS2812_COLOR_IVORY							= 0x00FFFFF0	,  //	象牙
+//		WS2812_COLOR_LIGHTYELLOW					= 0x00FFFFE0	,  //	浅黄色
+//		//WS2812_COLOR_YELLOW						= 0x00FFFF00	,  //	纯黄
+//		WS2812_COLOR_OLIVE							= 0x00808000	,  //	橄榄
+//		WS2812_COLOR_DARKKHAKI						= 0x00BDB76B	,  //	深卡其布
+//		WS2812_COLOR_LEMONCHIFFON					= 0x00FFFACD	,  //	柠檬薄纱
+//		WS2812_COLOR_PALEGODENROD					= 0x00EEE8AA	,  //	灰秋麒麟
+//		WS2812_COLOR_KHAKI							= 0x00F0E68C	,  //	卡其布
+//		WS2812_COLOR_GOLD							= 0x00FFD700	,  //	金
+//		WS2812_COLOR_CORNISLK						= 0x00FFF8DC	,  //	玉米色
+//		WS2812_COLOR_GOLDENROD						= 0x00DAA520	,  //	秋麒麟
+//		WS2812_COLOR_FLORALWHITE					= 0x00FFFAF0	,  //	花的白色
+//		WS2812_COLOR_OLDLACE						= 0x00FDF5E6	,  //	老饰带
+//		WS2812_COLOR_WHEAT							= 0x00F5DEB3	,  //	小麦色
+//		WS2812_COLOR_MOCCASIN						= 0x00FFE4B5	,  //	鹿皮鞋
+//		WS2812_COLOR_ORANGE						= 0x00FFA500	,  //	橙色
+//		WS2812_COLOR_PAPAYAWHIP					= 0x00FFEFD5	,  //	番木瓜
+//		WS2812_COLOR_BLANCHEDALMOND				= 0x00FFEBCD	,  //	漂白的杏仁
+//		WS2812_COLOR_NAVAJOWHITE					= 0x00FFDEAD	,  //	纳瓦霍白
+//		WS2812_COLOR_ANTIQUEWHITE					= 0x00FAEBD7	,  //	古代的白色
+//		WS2812_COLOR_TAN							= 0x00D2B48C	,  //	晒黑
+//		WS2812_COLOR_BRULYWOOD						= 0x00DEB887	,  //	结实的树
+//		WS2812_COLOR_BISQUE						= 0x00FFE4C4	,  //	(浓汤)乳脂,番茄等
+//		WS2812_COLOR_DARKORANGE					= 0x00FF8C00	,  //	深橙色
+//		WS2812_COLOR_LINEN							= 0x00FAF0E6	,  //	亚麻布
+//		WS2812_COLOR_PERU							= 0x00CD853F	,  //	秘鲁
+//		WS2812_COLOR_PEACHPUFF						= 0x00FFDAB9	,  //	桃色
+//		WS2812_COLOR_SANDYBROWN					= 0x00F4A460	,  //	沙棕色
+//		WS2812_COLOR_CHOCOLATE						= 0x00D2691E	,  //	巧克力
+//		WS2812_COLOR_SADDLEBROWN					= 0x008B4513	,  //	马鞍棕色
+//		WS2812_COLOR_SEASHELL						= 0x00FFF5EE	,  //	海贝壳
+//		WS2812_COLOR_SIENNA						= 0x00A0522D	,  //	黄土赭色
+//		WS2812_COLOR_LIGHTSALMON					= 0x00FFA07A	,  //	浅鲜肉(鲑鱼)色
+//		WS2812_COLOR_CORAL							= 0x00FF7F50	,  //	珊瑚
+//		WS2812_COLOR_ORANGERED						= 0x00FF4500	,  //	橙红色
+//		WS2812_COLOR_DARKSALMON					= 0x00E9967A	,  //	深鲜肉(鲑鱼)色
+//		WS2812_COLOR_TOMATO						= 0x00FF6347	,  //	番茄
+//		WS2812_COLOR_MISTYROSE						= 0x00FFE4E1	,  //	薄雾玫瑰
+//		WS2812_COLOR_SALMON						= 0x00FA8072	,  //	鲜肉(鲑鱼)色
+//		WS2812_COLOR_SNOW							= 0x00FFFAFA	,  //	雪
+//		WS2812_COLOR_LIGHTCORAL					= 0x00F08080	,  //	淡珊瑚色
+//		WS2812_COLOR_ROSYBROWN						= 0x00BC8F8F	,  //	玫瑰棕色
+//		WS2812_COLOR_INDIANRED						= 0x00CD5C5C	,  //	印度红
+//		//WS2812_COLOR_RED							= 0x00FF0000	,  //	纯红
+//		WS2812_COLOR_BROWN							= 0x00A52A2A	,  //	棕色
+//		WS2812_COLOR_FIREBRICK						= 0x00B22222	,  //	耐火砖
+//		WS2812_COLOR_DARKRED						= 0x008B0000	,  //	深红色
+//		WS2812_COLOR_MAROON						= 0x00800000	,  //	栗色
+//		WS2812_COLOR_WHITE							= 0x00FFFFFF	,  //	纯白
+//		WS2812_COLOR_WHITESMOKE					= 0x00F5F5F5	,  //	白烟
+//		WS2812_COLOR_GAINSBORO						= 0x00DCDCDC	,  //	亮灰色
+//		WS2812_COLOR_LIGHTGREY						= 0x00D3D3D3	,  //	浅灰色
+//		WS2812_COLOR_SILVER						= 0x00C0C0C0	,  //	银白色
+//		WS2812_COLOR_DARKGRAY						= 0x00A9A9A9	,  //	深灰色
+//		WS2812_COLOR_GRAY							= 0x00808080	,  //	灰色
+//		WS2812_COLOR_DIMGRAY						= 0x00696969	,  //	暗淡的灰色
+//		WS2812_COLOR_BLACK							= 0x00000000	,  //	纯黑//声明功能函数
+//}COLOR;
+#endif // LL_LED_PANEL_WS2812_H__
+
