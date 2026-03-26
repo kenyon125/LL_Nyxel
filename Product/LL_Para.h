@@ -129,6 +129,7 @@ unsigned long LL_Para__get_flashing_pattern(unsigned long mode, E_LL_LED light);
 void LL_Para__set_flashing_pattern_fromButtonSwitch(void);
 void LL_Para__set_flashing_pattern_fromApp(unsigned long flashing_pattern, unsigned long mode, E_LL_LED light);
 void LL_Para__set_flashing_pattern_fromSync(unsigned long flashing_pattern, unsigned long mode, E_LL_LED light);
+void LL_Para_store(void);
 
 // for LumOS
 #define setPara(name, value)    gtPara.name = value; gulFlashStoreNeeded = 1;

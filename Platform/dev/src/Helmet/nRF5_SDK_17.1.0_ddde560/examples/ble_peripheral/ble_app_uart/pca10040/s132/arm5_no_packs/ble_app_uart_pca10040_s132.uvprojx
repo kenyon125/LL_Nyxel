@@ -81,7 +81,7 @@
           </BeforeMake>
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
-            <RunUserProg2>1</RunUserProg2>
+            <RunUserProg2>0</RunUserProg2>
             <UserProg1Name>Make_DFUzip_and_ProductHex.bat</UserProg1Name>
             <UserProg2Name>Launch_Download_bat.bat</UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>

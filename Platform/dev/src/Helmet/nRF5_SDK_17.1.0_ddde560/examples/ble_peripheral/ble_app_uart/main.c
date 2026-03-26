@@ -53,9 +53,9 @@
 
 #define APP_BLE_CONN_CFG_TAG            1                                           /**< A tag identifying the SoftDevice BLE configuration. */
 
-#define MANUFACTURER_NAME               "LumenLabs"                                  /**< Manufacturer. Will be passed to Device Information Service. */
+#define MANUFACTURER_NAME               LL_BLE_MANU_NAME                                  /**< Manufacturer. Will be passed to Device Information Service. */
 
-#define DEVICE_NAME                     "Nyxel"                                  /**< Name of device. Will be included in the advertising data. */
+#define DEVICE_NAME                     LL_BLE_ADV_NAME                                  /**< Name of device. Will be included in the advertising data. */
 
 #define NUS_SERVICE_UUID_TYPE           BLE_UUID_TYPE_VENDOR_BEGIN                  /**< UUID type for the Nordic UART Service (vendor specific). */
 
@@ -788,8 +788,8 @@ static void buttons_leds_init(bool * p_erase_bonds)
 void LL_Power_BeforeSleep(void)
 {
     if(gulFlashStoreNeeded == 1 || gulFlashStoreNeeded == 2){ //If you have data to store before sleep
-        if(flash_store_finish()){
-            flash_store_beforeSleep();
+        if(LL_Flash_store_finish()){
+            LL_Flash_store_beforeSleep();
         }
     }
     LL_GPIO_OutputWrite(0, LL_PIN_CHARGING_POWER, LL_PIN_N__CHARGING_POWER);
@@ -799,48 +799,13 @@ void LL_Power_BeforeSleep(void)
     LL_LEDs_OFF();
     
     //wait flash write success 
-    if(!flash_store_finish()){
+    if(!LL_Flash_store_finish()){
         for(uint16_t i=0; i<LL_FLASH_WAITING_TIME_BEFORE_SLEEP; i++){
-            if(flash_store_finish()){break;}
+            if(LL_Flash_store_finish()){break;}
             nrf_delay_ms(1);
         }
     }
     LL_PWM_Sleep();LL_Key_Init();
-}
-
-unsigned long IndicatorOfBrakeFuncOnOff__time_cnt = 0;
-unsigned long IndicatorOfBrakeFuncOnOff__step_cnt = 0;
-void IndicatorOfBrakeFuncOnOff__Start(void) { 
-    LL_Timer_CntStart(IndicatorOfBrakeFuncOnOff__time_cnt);
-    //
-    if(1 == gtPara.ulBrakeFunction) { // brake function is ON
-
-        IndicatorOfBrakeFuncOnOff__step_cnt = 0; 
-    } else { // brake function must be OFF
-        IndicatorOfBrakeFuncOnOff__step_cnt = 0xFFFFFFFF; 
-    }
-}
-
-void IndicatorOfBrakeFuncOnOff__Stop( void) { 
-    LL_Timer_CntStop(IndicatorOfBrakeFuncOnOff__time_cnt);
-//  IndicatorOfBrakeFuncOnOff__step_cnt = 0; 
-}
-void IndicatorOfBrakeFuncOnOff(void) {
-    if(0 == IndicatorOfBrakeFuncOnOff__time_cnt) { return; } // this func is OFF
-    switch(IndicatorOfBrakeFuncOnOff__step_cnt) {
-        case 0:
-            if(2000 < LL_Timer_Elapsed_ms(IndicatorOfBrakeFuncOnOff__time_cnt)) { LL_Timer_CntStart(IndicatorOfBrakeFuncOnOff__time_cnt);
-                IndicatorOfBrakeFuncOnOff__step_cnt++;
-            }
-            break;
-        case 1:
-            //LL_HelmetActionWhenStateChanged();
-            IndicatorOfBrakeFuncOnOff__step_cnt++;
-            break;
-        default: // exception
-            IndicatorOfBrakeFuncOnOff__Stop();
-            break;
-    }
 }
 
 #if 0
@@ -949,8 +914,8 @@ int main(void)
 		}
     
 		{// Lumos main_init3_Flash
-					flash_init();
-					flash_load();
+					LL_Flash_init();
+					LL_Para_load();
 		}
 
     { // Lumos main_init4_AfterFlash
@@ -981,7 +946,7 @@ int main(void)
     for (;;)
     {
         LL_Battery_Mainloop(); // battery measuring
-        //LL_Para_store(); // flash auto-save
+        LL_Para_store(); // flash auto-save
 
         LL_Helmet_Mainloop();
         
@@ -1007,18 +972,6 @@ int main(void)
             }
         }   
 				
-     
-				//battery
-        if(1 == gulFlashStoreNeeded) { gulFlashStoreCnt = gulTimerCnt1ms;
-            gulFlashStoreNeeded = 2;                          
-        }else if(gulFlashStoreNeeded == 2){
-            if(2000 <= LL_Timer_Elapsed_ms(gulFlashStoreCnt)) { 
-                if(flash_store_finish()){
-                    gulFlashStoreCnt = gulTimerCnt1ms;
-                    flash_store();gulFlashStoreNeeded = 0;
-                }
-            }  
-        }
 
         if(1000 <= LL_Timer_Elapsed_ms(ulTimerCntAdapterBoardDetect)) {  //10S JUDGE
             ulTimerCntAdapterBoardDetect = gulTimerCnt1ms;
@@ -1129,7 +1082,7 @@ void LL_Charging_Display(void)
             }
             
             if(gulFlashStoreNeeded == 1){
-                flash_store();
+                LL_Flash_store();
                 gulFlashStoreNeeded = 0;
             }
             

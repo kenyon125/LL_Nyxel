@@ -33,7 +33,7 @@ static unsigned long sgulGeneralCnt;
 static unsigned long sgulBeepCnt;
 //static unsigned long sgulFrontLightFadeCnt;
 
-extern unsigned long gulFlashStoreNeeded;////flash_store(); 
+extern unsigned long gulFlashStoreNeeded;////LL_Flash_store(); 
 unsigned long IsVibrationNeedRunTime;
 static unsigned long sgulXxxTestPowerOffStep = 0;
 static unsigned long sgulXxxTestPowerOffCnt = 0;
@@ -45,6 +45,41 @@ extern uint16_t m_conn_handle;
 #if 1 // Enter pairing-mode instead of power-off, if a Long-Press since power-on.
 static unsigned long sgulEnterPairingModeIfLongPress = 0;
 #endif
+
+unsigned long IndicatorOfBrakeFuncOnOff__time_cnt = 0;
+unsigned long IndicatorOfBrakeFuncOnOff__step_cnt = 0;
+void IndicatorOfBrakeFuncOnOff__Start(void) { 
+    LL_Timer_CntStart(IndicatorOfBrakeFuncOnOff__time_cnt);
+    //
+    if(1 == gtPara.ulBrakeFunction) { // brake function is ON
+
+        IndicatorOfBrakeFuncOnOff__step_cnt = 0; 
+    } else { // brake function must be OFF
+        IndicatorOfBrakeFuncOnOff__step_cnt = 0xFFFFFFFF; 
+    }
+}
+
+void IndicatorOfBrakeFuncOnOff__Stop( void) { 
+    LL_Timer_CntStop(IndicatorOfBrakeFuncOnOff__time_cnt);
+//  IndicatorOfBrakeFuncOnOff__step_cnt = 0; 
+}
+void IndicatorOfBrakeFuncOnOff(void) {
+    if(0 == IndicatorOfBrakeFuncOnOff__time_cnt) { return; } // this func is OFF
+    switch(IndicatorOfBrakeFuncOnOff__step_cnt) {
+        case 0:
+            if(2000 < LL_Timer_Elapsed_ms(IndicatorOfBrakeFuncOnOff__time_cnt)) { LL_Timer_CntStart(IndicatorOfBrakeFuncOnOff__time_cnt);
+                IndicatorOfBrakeFuncOnOff__step_cnt++;
+            }
+            break;
+        case 1:
+            //LL_HelmetActionWhenStateChanged();
+            IndicatorOfBrakeFuncOnOff__step_cnt++;
+            break;
+        default: // exception
+            IndicatorOfBrakeFuncOnOff__Stop();
+            break;
+    }
+}
 
 void LL_Helmet_ChangeStateTo_Init()
 {

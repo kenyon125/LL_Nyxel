@@ -126,7 +126,7 @@ void LL_MsgHandle_Helmet(T_MSG_toHelmet *ptMsg)
         //
         // exit pairing mode at once:  //giPaired_Remote = 1;
         gtPara.tRemote.ulRoundRobin++; if(DEVICE_NUM_OF_XXX <= gtPara.tRemote.ulRoundRobin) {gtPara.tRemote.ulRoundRobin=0;}
-        gulFlashStoreNeeded = 1;////flash_store();                            
+        gulFlashStoreNeeded = 1;////LL_Flash_store();                            
         LL_Helmet_ChangeStateTo_ON();
     } else { // else, not Pairing Mode
         #ifdef _NOT_CHECK_REMOTE_ID_IN_TURNING_MESSAGE

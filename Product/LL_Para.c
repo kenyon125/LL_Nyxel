@@ -65,6 +65,23 @@ static inline char LL_ChkParaSize()
     return dummy[sizeof(T_Para)];  // If warning, means a fatal error that para size is larger than flash.
 }
 
+unsigned long gulFlashStoreNeeded = 0;
+static unsigned long gulFlashStoreCnt;
+void LL_Para_store(void) {
+    if(0 == gulFlashStoreNeeded) {
+        return;
+    } else if(1 == gulFlashStoreNeeded) { 
+        gulFlashStoreCnt = gulTimerCnt1ms;
+        gulFlashStoreNeeded = 2;
+    } else if(2 == gulFlashStoreNeeded) {
+        if(2000 <= LL_Timer_Elapsed_ms(gulFlashStoreCnt)) { //gulFlashStoreCnt = gulTimerCnt1ms;
+            LL_Flash_store();
+            gulFlashStoreNeeded = 0; 
+        }                            
+    } else { // exception
+        gulFlashStoreNeeded = 0;         
+    }
+}
 /*
 void LL_Para_UpdateAdcValueOfFullCharge(unsigned long ulAdcValue)
 {

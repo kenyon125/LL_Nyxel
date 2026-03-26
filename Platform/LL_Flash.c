@@ -5,9 +5,6 @@
 #include "LL_Platform.h"
 #include "LL_Para.h"
 
-unsigned long gulFlashStoreNeeded = 0;////flash_store();                            
-unsigned long gulFlashStoreCnt = 0x80000000;
-
 #define CONFIG_FILE     (0x8010)
 #define CONFIG_REC_KEY  (0x7010)
 
@@ -181,7 +178,7 @@ static void set_default(void) {
     gulFlashStoreNeeded = 1; }      
 }
 
-void flash_init(void)
+void LL_Flash_init(void)
 {
    ret_code_t err_code;
     
@@ -274,7 +271,7 @@ void flash_init(void)
         } 
         
         for(uint16_t i=0; i<LL_FLASH_GC_WAITING_TIME; i++){
-            if(flash_gc_finish()){break;}
+            if(LL_Flash_gc_finish()){break;}
             nrf_delay_ms(1);
         }
       }
@@ -321,17 +318,17 @@ void flash_init(void)
 //        //while(!m_fds_writeflag);     
 }
 
-bool flash_store_finish(void)
+bool LL_Flash_store_finish(void)
 {
     return m_fds_writeflag;
 }
 
-bool flash_gc_finish(void)
+bool LL_Flash_gc_finish(void)
 {
     return m_fds_gc_done;
 }
 
-void flash_store(void)
+void LL_Flash_store(void)
 {
     ret_code_t err_code;
     fds_record_desc_t desc = {0};//The descriptor structure used to manipulate the record is zeroed out
@@ -358,10 +355,10 @@ void flash_store(void)
             } 
             
             for(uint16_t i=0; i<LL_FLASH_GC_WAITING_TIME; i++){
-                if(flash_gc_finish()){break;}
+                if(LL_Flash_gc_finish()){break;}
                 nrf_delay_ms(1);
             }
-            if(flash_gc_finish()){
+            if(LL_Flash_gc_finish()){
                 m_fds_writeflag = false;
                 err_code = fds_record_update(&desc, &gtPara_record);
                 if(err_code == NRF_SUCCESS){
@@ -383,7 +380,7 @@ void flash_store(void)
     }		
 }
 
-void flash_store_beforeSleep(void)
+void LL_Flash_store_beforeSleep(void)
 {
     ret_code_t err_code;
     fds_record_desc_t desc = {0};//The descriptor structure used to manipulate the record is zeroed out
@@ -410,7 +407,7 @@ void flash_store_beforeSleep(void)
             } 
             
             for(uint16_t i=0; i<LL_FLASH_WAITING_TIME_BEFORE_SLEEP; i++){
-                if(flash_gc_finish()){break;}
+                if(LL_Flash_gc_finish()){break;}
                 nrf_delay_ms(1);
             }
             
@@ -418,7 +415,7 @@ void flash_store_beforeSleep(void)
             err_code = fds_record_update(&desc, &gtPara_record);
             
             for(uint16_t i=0; i<LL_FLASH_WAITING_TIME_BEFORE_SLEEP; i++){
-                if(flash_store_finish()){break;}
+                if(LL_Flash_store_finish()){break;}
                 nrf_delay_ms(1);
             }            
         }          
@@ -432,7 +429,7 @@ void flash_store_beforeSleep(void)
     }		
 }
 
-void flash_load(void) {
+void LL_Para_load(void) {
 
     // set default or convert to current version
     if(LL_PARA_VERSION == gtPara.para_version) { // if right version
