@@ -859,7 +859,7 @@ void LL_Power_BeforeLowPowerMode(void)
 		
 		//why not set trigger?? Avoiding the GPIOTE pitfall: If the GPIOTE interrupt of nRF52 is not handled properly (without clearing the flag bit or being latched), it can easily cause power consumption to rebound to 1mA or the program to freeze. By not adding a trigger, this complex logic is completely bypassed.
 		//LL_Key_Init();
-		LL_Key_Init_With_Handler();
+		//LL_Key_Init_With_Handler();
 }
 void LL_Power_BeforeWakeup(void) {
 		{ // as Scanner / Central

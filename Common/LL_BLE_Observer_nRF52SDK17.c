@@ -65,8 +65,8 @@ static ble_gap_scan_params_t m_normal_mode_scan_param = { /**< Scan parameters r
 
 static ble_gap_scan_params_t m_low_power_mode_scan_param = { /**< Scan parameters requested for scanning and connection. */
     .active        = 0x01,
-		.interval    	 = 0x0A00,  // A00 means 1600ms // Determines scan interval in units of 0.625 millisecond.
-		.window      	 = 0x00A0,  // A0 means 100ms,
+		.interval    	 = 0x06E0,  // 6E0 means 1100ms // Determines scan interval in units of 0.625 millisecond.
+		.window      	 = 0x0080,  // 80 means 80ms,
     .filter_policy = BLE_GAP_SCAN_FP_ACCEPT_ALL,
     .timeout       = 0, // Duration of a scanning session in units of 10 ms. Range: 0x0001 - 0xFFFF (10 ms to 10.9225 ms). If set to 0x0000, the scanning continues until it is explicitly disabled. 
     .scan_phys     = BLE_GAP_PHY_1MBPS,
