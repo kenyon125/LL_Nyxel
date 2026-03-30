@@ -29,6 +29,7 @@ void LL_Battery_Charging_Animation_Init(void)
 
     glPowerOnAnimationPlayOff = true; //don't need play at first	
 		
+		LL_BLE_Adv_stop();
 		//Charging Animation
     LL_Drv_Ws2812_SetRearAnimation(LED_ANIMATION_CHARGING);
 	
