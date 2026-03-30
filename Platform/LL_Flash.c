@@ -30,6 +30,7 @@ static T_Para gtStorePara =
 	.publicNetworkEnabled = 1,
 	.netID_exist = 0,
 	.syncPowerOff = 1,
+	.glFactoryMode = false,
 };
 
 /* A record containing dummy configuration data. */
@@ -175,6 +176,7 @@ static void set_default(void) {
         //
         gtPara.netID_exist = 0;
 				gtPara.syncPowerOff = 1;
+				gtPara.glFactoryMode = true;
     gulFlashStoreNeeded = 1; }      
 }
 

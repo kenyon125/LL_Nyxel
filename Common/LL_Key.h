@@ -26,7 +26,7 @@ extern T_LL_KEY_CFG gatKeyCfg[LL_KEY_NUM_MAX];
 void LL_Key_Init(void); //(unsigned long N)    
 void LL_Key_Scan(void); //(unsigned long N)
 void LL_Key_Init_With_No_Trigger(void); //(unsigned long N)
-void LL_Key_Init_With_Handler(void);
+//void LL_Key_Init_With_Handler(void);
 
 typedef struct
 {

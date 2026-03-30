@@ -34,6 +34,7 @@ void LL_Battery_Charging_Animation_Init(void)
     LL_Drv_Ws2812_SetRearAnimation(LED_ANIMATION_CHARGING);
 	
 		gtPara.ulNeedCharge = 0;
+		gtPara.glFactoryMode = false;
 		gulFlashStoreNeeded = 1;
 }
 

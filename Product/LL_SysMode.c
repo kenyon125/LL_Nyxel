@@ -568,34 +568,36 @@ static inline void LL_Helmet_State_OFF(void)
             break;
         case  6:
             if( 1 == LL_GPIO_InputRead(gatKeyCfg[LL_KEY_NUM_ONOFF].port, gatKeyCfg[LL_KEY_NUM_ONOFF].pin) ) { 
-                LL_Power_BeforeLowPowerMode();
-
-                { //LL_Power_Sleep();
-                    while(1) {
+								if(gtPara.glFactoryMode == true || gtPara.ulNeedCharge) {//if factory mode set or need charge, should enter deep sleep mode
+										LL_Power_BeforeSleep();
+										LL_Power_Sleep();
+								}else{
+										LL_Power_BeforeLowPowerMode();
+										while(1) {
 												nrf_pwr_mgmt_run();
-                        //
-                        if( gatKeyCfg[LL_KEY_NUM_ONOFF].normal != LL_GPIO_InputRead(gatKeyCfg[LL_KEY_NUM_ONOFF].port, gatKeyCfg[LL_KEY_NUM_ONOFF].pin) ) { // if key is pressed probably
-                            wake_up_event__key_pressed = true;
-                        }
-                        //
-                        if( wake_up_event__power_on_cmd_scanned
-                        ||  wake_up_event__key_pressed          ) {
+												//
+												if( gatKeyCfg[LL_KEY_NUM_ONOFF].normal != LL_GPIO_InputRead(gatKeyCfg[LL_KEY_NUM_ONOFF].port, gatKeyCfg[LL_KEY_NUM_ONOFF].pin) ) { // if key is pressed probably
+														wake_up_event__key_pressed = true;
+												}
+												//
+												if( wake_up_event__power_on_cmd_scanned
+												||  wake_up_event__key_pressed          ) {
 														LL_Key_Init_With_No_Trigger(); 
-                            break;
-                        }
-                    }
-                    if(wake_up_event__key_pressed) { wake_up_event__key_pressed = false;
-                        LL_Power_BeforeWakeup(); 
-                        gtSysState.eTurnState = TURNING_NONE; 
+														break;
+												}
+										}
+										if(wake_up_event__key_pressed) { wake_up_event__key_pressed = false;
+												LL_Power_BeforeWakeup(); 
+												gtSysState.eTurnState = TURNING_NONE; 
 
-                        LL_Helmet_ChangeStateTo_BeepBeforeON();  // just like wake up from SYSTEM OFF
-                    }
-                    if(wake_up_event__power_on_cmd_scanned) { wake_up_event__power_on_cmd_scanned = false;
-                        LL_Power_BeforeWakeup(); 
-                        gtSysState.eTurnState = TURNING_NONE; 
-                        LL_Helmet_ChangeStateTo_BeepBeforeON();
-                    }
-                }
+												LL_Helmet_ChangeStateTo_Init();  // just like wake up from SYSTEM OFF
+										}
+										if(wake_up_event__power_on_cmd_scanned) { wake_up_event__power_on_cmd_scanned = false;
+												LL_Power_BeforeWakeup(); 
+												gtSysState.eTurnState = TURNING_NONE; 
+												LL_Helmet_ChangeStateTo_BeepBeforeON();
+										}
+								}
             } else {
                 // do nothing, just wait key released.
             }

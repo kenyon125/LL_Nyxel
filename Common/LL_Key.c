@@ -15,11 +15,6 @@ static unsigned long sgaulState[         LL_KEY_NUM_MAX ];   // every key has a 
 static unsigned long sgaulIgnoreRelease[ LL_KEY_NUM_MAX ];   // whether ignore the next release after a meaningful long press.
 static T_LL_KEY_EVT sgtEvt = {0xFFFFFFFF, 0};
 
-void ll_key_pin_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
-{
-    // nothing need to do
-}
-
 void LL_Key_Init(void) //(unsigned long N)
 {	
     for( unsigned long N = 0; N < LL_KEY_NUM_MAX; N++ ) {
@@ -36,6 +31,13 @@ void LL_Key_Init_With_No_Trigger(void) //(unsigned long N)
     }
 }
 
+#if 0
+void ll_key_pin_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
+{
+    // nothing need to do
+}
+
+
 void LL_Key_Init_With_Handler(void)
 {
 		if (!nrf_drv_gpiote_is_init()) {
@@ -49,7 +51,7 @@ void LL_Key_Init_With_Handler(void)
     nrf_drv_gpiote_in_init(gatKeyCfg[LL_KEY_NUM_ONOFF].pin, &config, ll_key_pin_handler);
     nrf_drv_gpiote_in_event_enable(gatKeyCfg[LL_KEY_NUM_ONOFF].pin, true);
 }
-
+#endif
 
 static unsigned long sgulOneKeyPerScan = 0xFFFFFFFF;
 void LL_Key_Scan(void) //(unsigned long N)
