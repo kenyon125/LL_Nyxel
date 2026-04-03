@@ -226,6 +226,13 @@ LL_Thread__step_func thread_steps__beep[] = {
     LL_Thread__delay_ms(125),
     LL_Thread__step__END_OR_LOOP_THIS_THREAD
 };
+LL_Thread__step_func thread_steps__keyPress_beep[] = {
+    buzzer_on,// 1 buzzer_on is quite short, while 2 buzzer_on is ok, still don't know why 
+    LL_Thread__delay_ms(50),
+    buzzer_off,
+    LL_Thread__delay_ms(50),
+    LL_Thread__step__END_OR_LOOP_THIS_THREAD
+};
 T_LL_Thread__var thread_var__beep;
 void LL_Helmet_ChangeStateTo_BeepBeforeON(void)
 {
@@ -415,8 +422,8 @@ static inline void LL_Helmet_State_ON(void)
 						needSwitchMode = 2;
 				}
     }else if(2 == needSwitchMode){
-//        if(       50 > LL_Timer_Elapsed_ms(sgulBeepCnt) ) { LL_LED_ON(  E_LL_PWM_BUZZER ); }
-//        else if(  100 > LL_Timer_Elapsed_ms(sgulBeepCnt) ) { LL_LED_OFF( E_LL_PWM_BUZZER ); needSwitchMode = 0;}  //need buzzer!!
+				LL_Thread__start(&thread_var__beep, thread_steps__keyPress_beep, 0);
+				needSwitchMode = 0;  
     }
 
     if(glAdapterBoardConnState == ADAPTEBOARD_DISCONNECT){ LL_Helmet_ChangeStateTo_BeepBeforeOFF(); }

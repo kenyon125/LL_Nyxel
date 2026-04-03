@@ -24,13 +24,13 @@
 //#define LL_VER_L        0
 //
 // Vx.yz
-#define LL_VER_BLE_DIS  "V2.13"  // BLE DIS service, length ?
+#define LL_VER_BLE_DIS  "V2.14"  // BLE DIS service, length ?
 #define LL_VER_x        2
 #define LL_VER_y        1
-#define LL_VER_z        3
+#define LL_VER_z        4
 //
 // Date when building
-#define LL_VER_DATE     0xA31E  // 0xYMDD: Y(0~F) is 2016~2031, M(1~C) is Jun~Dec, DD(01~1F) is 1~31.
+#define LL_VER_DATE     0xA403  // 0xYMDD: Y(0~F) is 2016~2031, M(1~C) is Jun~Dec, DD(01~1F) is 1~31.
 
 
 

@@ -194,7 +194,7 @@ void battery_level_update(void)
     
     if(batCnt == 15){
         if( (batteryLevelTotal/batCnt <= 3) ){
-            //LL_BatteryIndicator__Start();  
+            LL_Thread__start(&thread_var__battery_indicator__main, steps_battery_indicator_when_running, 0);  
         }      
         batteryLevelTotal = 0;
         batCnt = 0;
